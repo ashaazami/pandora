@@ -11,4 +11,6 @@ if __name__ == "__main__":
     data.loc[data["Type"] == 2, "Price"] = np.random.rand(sum(data["Type"] == 2)) * 5 + 3
     data["Parity"] = np.random.randint(0, 2, size=3000).astype(str)
 
-    dis.plot_vs_discrete(data, "Type", "Price", "Parity", "Price per Type for each Parity", None)
+    plot = dis.plot_vs_discrete(data, "Type", "Price", "Parity", "Price per Type for each Parity", None)
+
+    print(plot)
