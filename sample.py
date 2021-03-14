@@ -1,4 +1,4 @@
-import distribution as dis
+from pandora import distribution as dis
 import pandas as pd
 import numpy as np
 
