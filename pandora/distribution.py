@@ -1,5 +1,6 @@
 import pandas as pd
 import plotnine as plot
+import numpy as np
 
 
 def plot_vs_discrete(data_table,
@@ -31,24 +32,6 @@ def plot_vs_discrete(data_table,
         gg_result = gg_result + plot.ylim(ylim)
 
     return gg_result
-
-
-def _aggregate_vs_continuous(data_table,
-                             continuous_metric_name,
-                             bins,
-                             metric_name,
-                             segment_name,
-                             aggregate="mean"):
-    data_filtered = \
-        data_table.loc[((pd.notnull(data_table[metric_name])) & (pd.notnull(data_table[continuous_metric_name])))][
-            [continuous_metric_name, metric_name, segment_name]]
-    result = data_filtered.groupby(
-        [pd.Categorical(pd.cut(data_filtered[continuous_metric_name], right=False, include_lowest=True, bins=bins)),
-         segment_name]).agg({metric_name: aggregate}).reset_index()
-
-    result[metric_name] = round(result[metric_name], 3)
-
-    return result
 
 
 def plot_vs_continuous(data_table,
@@ -84,3 +67,47 @@ def plot_continuous_distribution(data_table,
         result = result + plot.xlim(xlim)
     return result
 
+
+def bin_and_plot_vs_continuous(data_table,
+                               continuous_metric_name,
+                               breaks,
+                               metric_name,
+                               segment_name,
+                               title,
+                               aggregation="mean"):
+    quantile = _quantile_bin(data_table, continuous_metric_name, breaks)
+
+    result = plot_vs_continuous(data_table, continuous_metric_name, quantile, metric_name, segment_name, title,
+                                aggregation)
+    return result
+
+
+def _quantile_bin(data_table, continuous_metric_name, number_of_bins):
+    q = np.linspace(0, 1, num=number_of_bins)
+    quantiles = np.unique(np.quantile(data_table[continuous_metric_name], q=q))
+    return quantiles
+
+
+def _factor_by_quantile(data_table, continuous_metric_name, number_of_bins):
+    quantiles = _quantile_bin(data_table, continuous_metric_name, number_of_bins)
+    factors = pd.Categorical(
+        pd.cut(data_table[continuous_metric_name], right=False, include_lowest=True, bins=quantiles))
+    return factors
+
+
+def _aggregate_vs_continuous(data_table,
+                             continuous_metric_name,
+                             bins,
+                             metric_name,
+                             segment_name,
+                             aggregate="mean"):
+    data_filtered = \
+        data_table.loc[((pd.notnull(data_table[metric_name])) & (pd.notnull(data_table[continuous_metric_name])))][
+            [continuous_metric_name, metric_name, segment_name]]
+    result = data_filtered.groupby(
+        [pd.Categorical(pd.cut(data_filtered[continuous_metric_name], right=False, include_lowest=True, bins=bins)),
+         segment_name]).agg({metric_name: aggregate}).reset_index()
+
+    result[metric_name] = round(result[metric_name], 3)
+
+    return result
