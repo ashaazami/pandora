@@ -27,6 +27,6 @@ if __name__ == "__main__":
     plot = dis.plot_continuous_distribution(data, "Temperature", "Parity", "Temperature distribution for each Parity")
     print(plot)
 
-    plot = dis.plot_scatter_vs_continuous(data, "Temperature", 5, "Price", "Parity",
+    plot = dis.plot_scatter_vs_continuous(data, "Temperature", "Price", "Parity",
                                           "Price per Temperature for each Parity")
     print(plot)

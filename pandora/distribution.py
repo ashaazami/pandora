@@ -55,17 +55,16 @@ def plot_vs_continuous(data_table,
 
 def plot_scatter_vs_continuous(data_table,
                                continuous_metric_name,
-                               breaks,
+
                                metric_name,
                                segment_name,
                                title,
                                aggregate="mean"):
-    result = _aggregate_vs_continuous(data_table, continuous_metric_name, breaks, metric_name, segment_name, aggregate)
     gg_result = plot.ggplot(data_table) + plot.aes(x=continuous_metric_name,
-                                               y=metric_name,
-                                               fill=segment_name,
-                                               label=metric_name
-                                               ) + \
+                                                   y=metric_name,
+                                                   fill=segment_name,
+                                                   label=metric_name
+                                                   ) + \
                 plot.geom_point(stat="identity") + \
                 plot.labs(x=continuous_metric_name, y=aggregate + "(" + metric_name + ")", title=title)
     return gg_result
